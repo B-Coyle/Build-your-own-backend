@@ -12,7 +12,7 @@ const createBook = (knex, book) => {
     booksData.forEach(book => {
       additionalPromise.push(
         createAdditional(knex, {
-          '#_of_pages': book.additional.pages,
+          pages: book.additional.pages,
           list_price: book.additional.list_price,
           books_id: bookID[0]
         })
