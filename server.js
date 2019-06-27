@@ -111,3 +111,70 @@ app.post("/api/v1/additional", (request, response) => {
     response.status(500).json({ error })
   })
 });
+
+app.delete('/api/v1/books/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+
+  database('books')
+    .select()
+    .then( async (books) => {
+      if (!books.some(books => books.id === id)) {
+        res.status(404).json({ error: 'Book information does not exist' }) 
+      } else {
+        await database('books')
+          .where({ id })
+          .del()
+        res.status(202)
+      };
+    }).catch(error => {
+      res.status(500).json({ error })
+    })
+});
+
+
+app.delete('/api/v1/books/:id', (request, response) => {
+  let found = false
+  database('books').select()
+    .then(book => {
+      book.forEach(book => {
+        if (book.id === parseInt((request.params.id))) {
+          found = true
+        }
+      })
+      if (!found) {
+        return response.status(404).json(`Book not found - delete unsuccessful`)
+      } else {
+        database('books').where('id', parseInt(request.params.id)).del()
+          .then(() => {
+            response.status(202).json(`Deleted book with id of ${request.params.id}`)
+          })
+      }
+    })
+    .catch(error => {
+      response.status(500).json({ error })
+    })
+})
+
+
+app.delete('/api/v1/additional/:id', (request, response) => {
+  let found = false
+  database('additional').select()
+    .then(info => {
+      info.forEach(info => {
+        if (info.id === parseInt((request.params.id))) {
+          found = true
+        }
+      })
+      if (!found) {
+        return response.status(404).json(`Additional information about book not found - delete unsuccessful`)
+      } else {
+        database('books').where('id', parseInt(request.params.id)).del()
+          .then(() => {
+            response.status(202).json(`Deleted additional information about book with id of ${request.params.id}`)
+          })
+      }
+    })
+    .catch(error => {
+      response.status(500).json({ error })
+    })
+})
