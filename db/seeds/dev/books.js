@@ -1,6 +1,5 @@
 const booksData = require('../../../data')
 
-console.log(booksData)
 const createBook = (knex, book) => {
   return knex('books').insert({
     title: book.title,
