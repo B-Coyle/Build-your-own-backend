@@ -91,7 +91,7 @@ app.post("/api/v1/books", (request, response) => {
       response.status(500).json({ error });
     });
 });
-
+//need to submit a book with it as well so it add a proper object 
 app.post("/api/v1/additional", (request, response) => {
   const newInfo = request.body;
   const format = ["pages", "list_price"];
