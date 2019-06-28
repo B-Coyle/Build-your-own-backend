@@ -1,0 +1,23 @@
+{
+  "name": "Build-your-own-backend",
+  "version": "1.0.0",
+  "engines": {
+    "node": "10.3.0"
+  },
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "knex": "^0.18.0",
+    "nightmare": "^3.0.2",
+    "pg": "^7.11.0"
+  },
+  "devDependencies": {},
+  "description": ""
+}
