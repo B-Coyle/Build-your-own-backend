@@ -104,28 +104,28 @@ app.get("/api/v1/additional/:id", (request, response) => {
     })
     .catch(error => {
       response.status(500).json({ error });
-            //if there was a problem with the request itself, send a status code of 422 and a error message
+      //if there was a problem with the request itself, send a status code of 422 and a error message
     });
 });
 
 app.post("/api/v1/books", (request, response) => {
   //App is making a post request to /api/v1/books to add a new book to the database
   const newBook = request.body;
-    //the book info from the request body is used to make a new book 
+  //the book info from the request body is used to make a new book
   const format = ["title", "author", "description"];
   //setting a variable for the required format
   for (let requiredParam of format) {
-        //if the book we want to add is missing one of the required params
+    //if the book we want to add is missing one of the required params
     if (!newBook[requiredParam] && !newBook[requiredParam] === "") {
       return response.status(422).send({
         error: `Expected format: ${format}. You are missing ${requiredParam}.`
       });
-            //Return a status code of 422 with an error message of what they are missing
+      //Return a status code of 422 with an error message of what they are missing
     }
   }
   database("books")
     .insert(newBook, "id")
-      //if the user includes all the required parameters, add the new book to the books database. 
+    //if the user includes all the required parameters, add the new book to the books database.
     .then(book => {
       response.status(201).json({ id: book[0] });
       //once the book is added in correctly, send a status code of 201 with the json of the new book's id
@@ -135,35 +135,48 @@ app.post("/api/v1/books", (request, response) => {
       //if there was an error with the request send a status code of 500 and a error message
     });
 });
+
 app.post("/api/v1/additional", (request, response) => {
+  //App is making a post request to /api/v1/additional to add a additional information about a book to the database
   const info = request.body;
+  //the additional info from the request body is used to make a additional information
   const format = ["pages", "list_price"];
+  //setting a variable for the required format
   for (let requiredParam of format) {
+        //if the additional information we want to add is missing one of the required params
     if (!info[requiredParam]) {
       return response.status(422).send({
         error: `Expected format: ${format}. You are missing ${requiredParam}.`
       });
+            //Return a status code of 422 with an error message of what they are missing
     }
   }
   let newInfo = {
     pages: info.pages,
     list_price: info.list_price
   };
+  //setting a variable with new information including what it should include/target
   database("additional")
-    .where({ id: info.title })
+  //target the additional database
+    .where({ id: info.pages })
+    //where the id is the info pages
     .select("id")
+    //select the id
     .then(additionalID =>
       database("additional").insert(
         { ...newInfo, book_id: additionalID[0].id },
         "id"
       )
+      //insert into the database the newinfomation, the bookID that was targeted
     )
     .then(newID => {
       response.status(201).json({ id: newID[0] });
     })
+    //then once it's successful send a status code of 201 with the json new id
     .catch(error => {
       response.status(500).json({ error });
     });
+    //otherwise, if it didn't work send a status code of 500  and an error message
 });
 
 app.delete("/api/v1/books/:id", (request, response) => {
