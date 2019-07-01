@@ -143,12 +143,12 @@ app.post("/api/v1/additional", (request, response) => {
   const format = ["pages", "list_price"];
   //setting a variable for the required format
   for (let requiredParam of format) {
-        //if the additional information we want to add is missing one of the required params
+    //if the additional information we want to add is missing one of the required params
     if (!info[requiredParam]) {
       return response.status(422).send({
         error: `Expected format: ${format}. You are missing ${requiredParam}.`
       });
-            //Return a status code of 422 with an error message of what they are missing
+      //Return a status code of 422 with an error message of what they are missing
     }
   }
   let newInfo = {
@@ -157,16 +157,17 @@ app.post("/api/v1/additional", (request, response) => {
   };
   //setting a variable with new information including what it should include/target
   database("additional")
-  //target the additional database
+    //target the additional database
     .where({ id: info.pages })
     //where the id is the info pages
     .select("id")
     //select the id
-    .then(additionalID =>
-      database("additional").insert(
-        { ...newInfo, book_id: additionalID[0].id },
-        "id"
-      )
+    .then(
+      additionalID =>
+        database("additional").insert(
+          { ...newInfo, book_id: additionalID[0].id },
+          "id"
+        )
       //insert into the database the newinfomation, the bookID that was targeted
     )
     .then(newID => {
@@ -176,22 +177,30 @@ app.post("/api/v1/additional", (request, response) => {
     .catch(error => {
       response.status(500).json({ error });
     });
-    //otherwise, if it didn't work send a status code of 500  and an error message
+  //otherwise, there was a request issue send a status code of 500  and an error message
 });
 
 app.delete("/api/v1/books/:id", (request, response) => {
+  //App is deleting a specific entry in books
   const { id } = request.params;
+  //the additional info from the request body is used to make a additional information
   database("books")
+    //target the books database
     .where({ id })
+    //where the id listed above
     .del()
+    //will be targetted to be deleted
     .then(deleted => {
       if (deleted) {
+        //if it was able to find the id that matches and successfully deleted send a status code of 204
         response.sendStatus(204);
       } else {
         response.status(404).json({ error: `No books with id of ${id} found` });
+        //If it can't find the id then is should send a status code of 404 and an error message that the book with that id wasn't found
       }
     })
     .catch(error => {
       response.status(500).json({ error });
+      //otherwise, there was a request issue send a status code of 500  and an error message
     });
 });
