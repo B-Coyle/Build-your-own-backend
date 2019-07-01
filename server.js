@@ -6,7 +6,7 @@ const database = require("knex")(configuration);
 
 const port = process.env.PORT || 3000;
 
-app.set('port', process.env.PORT || 3000)
+app.set("port", process.env.PORT || 3000);
 
 app.use(express.json());
 
@@ -79,10 +79,9 @@ app.post("/api/v1/books", (request, response) => {
   const format = ["title", "author", "description"];
   for (let requiredParam of format) {
     if (!newBook[requiredParam] && !newBook[requiredParam] === "") {
-      return response
-        .status(422)
-        .send({
-          error: `Expected format: ${format}. You are missing ${requiredParam}.`});
+      return response.status(422).send({
+        error: `Expected format: ${format}. You are missing ${requiredParam}.`
+      });
     }
   }
   database("books")
@@ -94,70 +93,45 @@ app.post("/api/v1/books", (request, response) => {
       response.status(500).json({ error });
     });
 });
-//need to submit a book with it as well so it add a proper object 
+//need to submit a book with it as well so it add a proper object
 app.post("/api/v1/additional", (request, response) => {
-  const newInfo = request.body;
+  const info = request.body;
   const format = ["pages", "list_price"];
   for (let requiredParam of format) {
-    if(!newInfo[requiredParam] && !newInfo[requiredParam] === ""){
+    if (!info[requiredParam]) {
       return response.status(422).send({
-        error:`Expected format: ${format}. You are missing ${requiredParam}.`
-      })
+        error: `Expected format: ${format}. You are missing ${requiredParam}.`
+      });
     }
   }
-  database('additional')
-  .insert(newInfo, 'id')
-  .then(newInfo => {
-    response.status(201).json({ id: newInfo[0]})
-  })
-  .catch(error=> {
-    response.status(500).json({ error })
-  })
+  let newInfo = {
+    pages: info.pages,
+    list_price: info.list_price
+  };
+  database("additional").where({ id: info.title})
+    .select("id")
+    .then(additionalID => database('additional').insert({...newInfo, book_id: additionalID[0].id }, 'id'))
+    .then(newID => {
+      response.status(201).json({ id: newID[0]})
+    })
+    .catch(error => {
+      response.status(500).json({ error });
+    });
 });
 
-// app.delete('/api/v1/books/:id', (request, response) => {
-//   let found = false
-//   database('books').select()
-//     .then(book => {
-//       book.forEach(book => {
-//         if (book.id === parseInt((request.params.id))) {
-//           found = true
-//         }
-//       })
-//       if (!found) {
-//         return response.status(404).json(`Book not found - delete unsuccessful`)
-//       } else {
-//         database('books').where('id', parseInt(request.params.id)).del()
-//           .then(() => {
-//             return response.status(202).json(`Deleted book with id of ${request.params.id}`)
-//           })
-//       }
-//     })
-//     .catch(error => {
-//       response.status(500).json({ error })
-//     })
-// })
-
-
-// app.delete('/api/v1/additional/:id', (request, response) => {
-//   let found = false
-//   database('additional').select()
-//     .then(info => {
-//       info.forEach(info => {
-//         if (info.id === parseInt((request.params.id))) {
-//           found = true
-//         }
-//       })
-//       if (!found) {
-//         return response.status(404).json(`Additional information about book not found - delete unsuccessful`)
-//       } else {
-//         database('books').where('id', parseInt(request.params.id)).del()
-//           .then(() => {
-//             response.status(202).json(`Deleted additional information about book with id of ${request.params.id}`)
-//           })
-//       }
-//     })
-//     .catch(error => {
-//       response.status(500).json({ error })
-//     })
-// })
+app.delete("/api/v1/books/:id", (request, response) => {
+  const { id } = request.params;
+  database("books")
+    .where({ id })
+    .del()
+    .then(deleted => {
+      if (deleted) {
+        response.sendStatus(204);
+      } else {
+        response.status(404).json({ error: `No books with id of ${id} found` });
+      }
+    })
+    .catch(error => {
+      response.status(500).json({ error });
+    });
+});
