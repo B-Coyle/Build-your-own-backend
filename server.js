@@ -115,19 +115,24 @@ app.post("/api/v1/books", (request, response) => {
   const format = ["title", "author", "description"];
   //setting a variable for the required format
   for (let requiredParam of format) {
+        //if the book we want to add is missing one of the required params
     if (!newBook[requiredParam] && !newBook[requiredParam] === "") {
       return response.status(422).send({
         error: `Expected format: ${format}. You are missing ${requiredParam}.`
       });
+            //Return a status code of 422 with an error message of what they are missing
     }
   }
   database("books")
     .insert(newBook, "id")
+      //if the user includes all the required parameters, add the new book to the books database. 
     .then(book => {
       response.status(201).json({ id: book[0] });
+      //once the book is added in correctly, send a status code of 201 with the json of the new book's id
     })
     .catch(error => {
       response.status(500).json({ error });
+      //if there was an error with the request send a status code of 500 and a error message
     });
 });
 app.post("/api/v1/additional", (request, response) => {
