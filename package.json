@@ -6,18 +6,25 @@
   },
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest --forceExit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "jest": "^24.8.0",
     "knex": "^0.18.0",
+    "mocha": "^6.1.4",
     "nightmare": "^3.0.2",
     "pg": "^7.11.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "supertest": "^4.0.2"
+  },
   "description": ""
 }
